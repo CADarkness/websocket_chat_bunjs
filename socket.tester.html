@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div>
+      <input type="text" id="userId" />
+      <button onclick="login()">Login</button>
+      <button onclick="logout()">Logout</button>
+      <button onclick="join_room()">Join room</button>
+    </div>
+    <button onclick="send_message()">Send message</button>
+    <button onclick="invite()">Invite</button>
+
+    <script>
+      const socket = new WebSocket("ws://localhost:4000");
+
+      const sender = ({ action, data }) => JSON.stringify({ action, data });
+
+      socket.addEventListener("message", (event) => {
+        const { action, data } = JSON.parse(event.data);
+        console.log(`On Message:`, action, data);
+      });
+
+      socket.addEventListener("open", (event) => {
+        console.log(`On Open:`, event);
+        // socket.send(
+        //   sender({
+        //     action: "join_room",
+        //     data: { roomId: "123123" },
+        //   })
+        // );
+      });
+
+      socket.addEventListener("close", (event) => {});
+
+      socket.addEventListener("error", (event) => {});
+
+      function login() {
+        const userId = document.querySelector("#userId");
+        if (!userId) {
+          alert("Enter userId!!!");
+          return;
+        }
+        socket.send(
+          sender({
+            action: "login",
+            data: { userId: "123123", token: "qweqweqweqweqweqwe" },
+          })
+        );
+      }
+
+      function logout() {
+        console.log(`logout`);
+      }
+
+      function join_room() {
+        socket.send(
+          sender({
+            action: "join_room",
+            data: { userId: "123123", roomId: "3333" },
+          })
+        );
+      }
+
+      function send_message() {
+        socket.send(
+          sender({
+            action: "send_message",
+            data: {
+              roomId: "123123",
+              message: "Tin nhan test",
+            },
+          })
+        );
+      }
+    
+      function invite() {
+        socket.send(sender({ action: "invite", data: { userId: "123123", roomObject: { _id: "12312312312",roomName: "Hello" }
+        } }))
+      }
+    </script>
+  </body>
+</html>
